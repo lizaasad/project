@@ -1,0 +1,242 @@
+#include <iostream>  
+#include <fstream>   
+#include <string>    
+#include <iomanip>   
+#include<Windows.h>
+using namespace std; 
+
+void addFlight();   // Function prototype for adding a new flight
+void viewFlight();  // Function prototype for viewing all flights
+void menu();       // Function prototype for displaying menu
+void checkFlight(); // Function prototype to check whether a flight exists
+void delFlight();   // Function prototype to delete a flight
+void editFlight();  // Function prototype for updating in the edit flight function:
+string dataa;        // Global variable of the string datatype for storing data generated in the add_id function to use in the add flight function
+
+
+void menu() 
+{
+	cout << "--------------------------------------------------------------------------" << endl // To print out text
+		<< "\t\t\tFLIGHTS RECORD\n--------------------------------------------------------------------------" << endl;
+	Sleep(1000);
+	cout << "1. Add Flight \n2. View Flight \n3. Check Flight \n4. Delete Flight Record \n5. Edit Flight Record \n6. Exit" << endl;
+	cout << "\nEnter the option: ";
+	int option;
+	cin >> option; // To take input from the user and store it in the 'option' variable
+
+	switch (option) // using a switch statement to display menu to the user
+	{
+	case 1: // The case that would run if the user's input was 1
+		cout << "--------------------------------------------------------------------------" << endl
+			<< "\t\t\t    ADD A NEW FLIGHT \n--------------------------------------------------------------------------" << endl; // To print out the message
+		addFlight();                                                                                                               // Calling the addFlight function
+		break;                                                                                                                     // To exit the switch and prevent the execution of other cases
+	case 2:                                                                                                                        // The case that would run if the user's input was 2
+		cout << "Flight Record: " << endl;                                                                                         // To print out the message i.e. flight record
+		viewFlight();                                                                                                              // Calling the viewFlight function
+		break;                                                                                                                     // To exit the switch and prevent the execution of other cases
+	case 3:                                                                                                                        // The case that would run if the user's input was 3
+		cout << "--------------------------------------------------------------------------" << endl
+			<< "\t\t\tCHECK EXISTING FLIGHT \n--------------------------------------------------------------------------" << endl; // To print out the message for the user
+		checkFlight();                                                                                                              // Calling the checkFlight function
+		break;                                                                                                                      // To exit the switch and prevent the execution of other cases
+	case 4:
+		cout << "--------------------------------------------------------------------------" << endl
+			<< "\t\t\tDELETE A FLIGHT RECORD \n--------------------------------------------------------------------------" << endl;
+		delFlight(); // Calling the delFlight function
+		break;       // To exit the switch and prevent the execution of other cases
+	case 5:
+		cout << "--------------------------------------------------------------------------" << endl
+			<< "\t\t\tEDIT A FLIGHT RECORD \n--------------------------------------------------------------------------" << endl;
+		editFlight(); // Calling the editFlight function
+		break;        // To exit the switch and prevent the execution of other cases
+// To print out the termination message
+	case 6: {
+		cout << "Program terminated";
+		exit(0);
+		break;
+	}
+	default:
+		cout << "Invalid Option!\n"; // To print out a message for an invalid option
+	}
+}
+
+void addFlight()
+{
+	string id, departure, arrival, time;       // Variables to store flight information
+	ofstream fout;                             // Output file stream to write to "Flights Record.txt"
+	fout.open("Flights Record.txt", ios::app); // Open the file in append mode
+	Sleep(1000);
+
+	cout << "Enter the flight ID \n(Pattern: XY-1234) " << endl;
+	cin >> id;// Retrieve the generated flight ID
+	Sleep(1000);
+	cout << "Enter Flight Departure Place: " << endl; // Prompt user to enter the departure place
+	cin >> departure;
+	Sleep(1000);
+	cout << "Enter Flight Arrival Place: " << endl; // Prompt user to enter the arrival place
+	cin >> arrival;
+	Sleep(1000);
+	cout << "Enter Departure Time: \n(Format: XX:XX:XX)" << endl; // Prompt user to enter departure time
+	cin >> time;
+	fout << setw(20) << left << id << setw(20) << left << departure << setw(20) << left << arrival << setw(15) << left << time << endl; // Write flight information to the file in a formatted way
+	fout.close();                                                                                                                       // Close the file
+}
+
+void viewFlight() // Function to view all flight records from the "Flights Record.txt" file
+{
+	ifstream fin; // Input file stream to read from "Flights Record.txt"
+
+	fin.open("Flights Record.txt"); // Open the file
+
+
+	cout << "----------------------------------------------------------------------" << setw(20) << left << "\nID" << setw(20) << left << " Departure" << setw(20) << left << " Arrival" << setw(15) << left << " Time" << endl
+		<< "----------------------------------------------------------------------" << endl // Display a header for the flight information table
+		<< endl;
+	Sleep(1000);
+	while (getline(fin, dataa)) // Read and display each line (flight record) from the file
+	{
+		cout << dataa << endl; // Display a footer for the flight information table
+	}
+	cout << "----------------------------------------------------------------------" << endl;
+	fin.close();
+	Sleep(1000);
+}
+
+void checkFlight() // Function to check if a flight record with a given ID exists in the "Flights Record.txt" file
+{
+	Sleep(1000);
+	string id1, id2; // Variables to store user input and check status
+	bool check = false;
+	cout << "Enter flight ID: " << endl; // Prompt user to enter a flight ID
+	cin >> id1;
+	Sleep(1000);
+	ifstream fin;                   // Input file stream to read from "Flights Record.txt"
+	fin.open("Flights Record.txt"); // Open the file
+
+	while (fin >> id2) // Loop through each line in the file to check if the given flight ID exists
+	{
+		if (id1 == id2)
+		{
+			check = true;
+			break;
+		}
+	}
+	if (check)
+	{
+		cout << "Flight Number " << id1 << " exists in the record." << endl; // Display the result of the flight ID check
+	}
+	else
+	{
+		cout << "Flight Number " << id1 << " does not exist!" << endl;
+	}
+	fin.close(); // Close the file
+}
+
+void delFlight() // Function to delete a flight record from the "Flights Record.txt" file
+{
+
+	string filename = "Flights Record.txt"; // File name for the flight records
+	string id;   
+	Sleep(1000);// User input for the flight ID to delete
+	cout << "Enter Flight ID you want to delete: ";
+	cin >> id;    // takes input and stores it in variable named id
+	ifstream fin; // Input file stream to read from the file
+	fin.open(filename);
+
+	ofstream fout; // Output file stream to write to a temporary file
+	fout.open("temp.txt");
+	string line; // Variables for reading and writing lines
+	bool deleted = false;
+
+	while (getline(fin, line)) // Iterate through each line in the file
+	{
+		if (line.find(id) != line.npos) // Check if the line contains the specified flight ID
+		{
+			deleted = true;
+			continue; // Skip writing this line to the temporary file
+		}
+		fout << line << endl; // Write the line to the temporary file
+	}
+
+	fin.close(); // Close the input and output files
+	fout.close();
+
+	if (deleted) // If a record was deleted, update the original file
+	{
+
+		if (remove(filename.c_str()) != 0) // Remove the original file
+		{
+			cout << "Error removing the original file." << endl;
+		}
+
+		if (rename("temp.txt", filename.c_str()) != 0) // Rename the temporary file to the original filename
+		{
+			cout << "Error renaming temporary file." << endl;
+		}
+		cout << "Flight number " << id << " has been deleted from the file." << endl; // Display a success message
+	}
+	else
+	{
+		cout << "No matching record found with Flight ID " << id << "." << endl; // Display a message if no matching record was found
+	}
+}
+
+
+void editFlight() // Function to edit a flight record in the "Flights Record.txt" file
+{
+	string filename = "Flights Record.txt"; // File name for the flight records
+	string id;      
+	Sleep(1000);// User input for the flight ID to edit
+	cout << "Enter Flight ID of the flight you want to edit: ";
+	cin >> id;
+
+	ifstream fin; // Input file stream to read from the file
+	fin.open(filename);
+
+
+
+	ofstream fout; // Output file stream to write to a temporary file
+	fout.open("temp.txt");
+	string line; // Variables for reading and writing lines
+	bool deleted = false;
+
+	while (getline(fin, line)) // Iterate through each line in the file
+	{
+		if (line.find(id) != line.npos) // Check if the line contains the specified flight ID
+		{
+			deleted = true;
+			addFlight(); // Call addFlight to add the edited flight information
+			continue;    // Skip writing the old line to the temporary file
+		}
+		fout << line << endl; // Write the old line to the temporary file
+	}
+
+	fin.close();  // Close the input  files
+	fout.close(); // Close the input and output files
+	if (deleted)  // If a record was edited, update the original file
+	{
+		if (remove(filename.c_str()) != 0) // Remove the original file
+		{
+			cout << "Error removing the original file." << endl;
+		}
+		if (rename("temp.txt", filename.c_str()) != 0) // Rename the temporary file to the original filename
+		{
+			cout << "Error renaming temporary file." << endl;
+		}
+		Sleep(1000);
+		cout << "Flight number " << id << " has been edited in the file." << endl; // Display a success message
+	}
+	else
+	{
+		cout << "No matching record found with Flight ID " << id << "." << endl; // Display a message if no matching record was found
+	}
+}
+int main()
+{
+	while (true)
+	{
+		menu();
+	}
+	return 0;
+}
